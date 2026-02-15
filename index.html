@@ -366,7 +366,7 @@
         <div class="stat-card">
             <h3>選択月の支出</h3>
             <div class="amount" id="statExpense">850</div>
-            <div class="trend" id="statExpenseTrend">コジマー (85%)</div>
+            <div class="trend" id="statExpenseTrend">コジマー二 (85%)</div>
         </div>
         <div class="stat-card">
             <h3>選択月の残高</h3>
@@ -567,7 +567,7 @@
 
         document.getElementById('statBudget').textContent = data.budget.toLocaleString();
         document.getElementById('statExpense').textContent = totalExpense.toLocaleString();
-        document.getElementById('statExpenseTrend').textContent = 'ダイヤモンド (' + percentage + '%)';
+        document.getElementById('statExpenseTrend').textContent = 'コジマーニ (' + percentage + '%)';
         document.getElementById('statBalance').textContent = balance.toLocaleString();
         document.getElementById('statBalanceTrend').textContent = '残り ' + (100 - percentage).toFixed(1) + '%';
         
