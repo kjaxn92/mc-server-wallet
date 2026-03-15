@@ -1,0 +1,474 @@
+<!DOCTYPE html>
+
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>財政取引記録システム</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-50">
+
+<div class="max-w-7xl mx-auto p-8">
+
+```
+<!-- ヘッダー -->
+<div class="bg-gradient-to-r from-blue-600 to-blue-800 text-white p-8 rounded-lg shadow-lg mb-8">
+    <h1 class="text-4xl font-bold mb-2">📒 財政取引記録システム</h1>
+    <p class="text-blue-100">収入・支出をリアルタイムで記録・管理</p>
+    <div class="mt-4 flex gap-4">
+        <div class="bg-blue-700 px-4 py-2 rounded">
+            <span class="text-sm">現在の国庫残高</span>
+            <div id="現在残高" class="text-2xl font-bold"></div>
+        </div>
+        <div class="bg-blue-700 px-4 py-2 rounded">
+            <span class="text-sm">総取引件数</span>
+            <div id="総件数" class="text-2xl font-bold"></div>
+        </div>
+    </div>
+</div>
+
+<!-- タブ -->
+<div class="bg-white rounded-lg shadow-md mb-8">
+    <div class="flex border-b">
+        <button onclick="切り替え('記録')" id="tab-記録" class="px-6 py-4 font-bold border-b-2 border-blue-600 text-blue-600">
+            ✍️ 取引を記録
+        </button>
+        <button onclick="切り替え('一覧')" id="tab-一覧" class="px-6 py-4 font-bold text-gray-500 hover:text-gray-700">
+            📋 取引履歴
+        </button>
+        <button onclick="切り替え('分析')" id="tab-分析" class="px-6 py-4 font-bold text-gray-500 hover:text-gray-700">
+            📊 集計・分析
+        </button>
+    </div>
+</div>
+
+<!-- ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+     記録画面
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ -->
+<div id="記録画面">
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        
+        <!-- 収入を記録 -->
+        <div class="bg-green-50 p-6 rounded-lg shadow-md border-2 border-green-200">
+            <h2 class="text-2xl font-bold text-green-700 mb-4">📈 収入を記録</h2>
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-sm font-bold text-gray-700 mb-2">種類</label>
+                    <select id="収入種類" class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-green-500">
+                        <option value="消費税">消費税</option>
+                        <option value="所得税">所得税</option>
+                        <option value="建築許可税">建築許可税</option>
+                        <option value="サーバー料金">サーバー料金</option>
+                        <option value="罰金">罰金</option>
+                        <option value="土地売却">土地売却</option>
+                        <option value="その他">その他</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-sm font-bold text-gray-700 mb-2">金額（コジマーニ）</label>
+                    <input type="number" id="収入金額" placeholder="1000" class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-green-500">
+                </div>
+                <div>
+                    <label class="block text-sm font-bold text-gray-700 mb-2">詳細・メモ</label>
+                    <input type="text" id="収入メモ" placeholder="例：〇〇さんから建築許可税" class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-green-500">
+                </div>
+                <button onclick="収入を記録()" class="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-3 rounded-lg transition">
+                    ✅ 収入を記録
+                </button>
+            </div>
+        </div>
+
+        <!-- 支出を記録 -->
+        <div class="bg-red-50 p-6 rounded-lg shadow-md border-2 border-red-200">
+            <h2 class="text-2xl font-bold text-red-700 mb-4">📉 支出を記録</h2>
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-sm font-bold text-gray-700 mb-2">種類</label>
+                    <select id="支出種類" class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-red-500">
+                        <option value="総理給料">総理給料</option>
+                        <option value="大臣給料">大臣給料</option>
+                        <option value="公務員給料">公務員給料</option>
+                        <option value="公共事業">公共事業</option>
+                        <option value="給付金">給付金</option>
+                        <option value="インフラ整備">インフラ整備</option>
+                        <option value="報酬">報酬</option>
+                        <option value="その他">その他</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-sm font-bold text-gray-700 mb-2">金額（コジマーニ）</label>
+                    <input type="number" id="支出金額" placeholder="500" class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-red-500">
+                </div>
+                <div>
+                    <label class="block text-sm font-bold text-gray-700 mb-2">詳細・メモ</label>
+                    <input type="text" id="支出メモ" placeholder="例：〇〇さんへ建築報酬" class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-red-500">
+                </div>
+                <button onclick="支出を記録()" class="w-full bg-red-600 hover:bg-red-700 text-white font-bold py-3 rounded-lg transition">
+                    ✅ 支出を記録
+                </button>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- 最近の取引 -->
+    <div class="mt-6 bg-white p-6 rounded-lg shadow-md">
+        <h3 class="text-xl font-bold text-gray-800 mb-4">🕐 最近の取引（直近10件）</h3>
+        <div id="最近の取引" class="space-y-2"></div>
+    </div>
+</div>
+
+<!-- ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+     一覧画面
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ -->
+<div id="一覧画面" class="hidden">
+    
+    <!-- フィルター -->
+    <div class="bg-white p-6 rounded-lg shadow-md mb-6">
+        <h3 class="text-xl font-bold text-gray-800 mb-4">🔍 フィルター</h3>
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+            <div>
+                <label class="block text-sm font-bold mb-2">種別</label>
+                <select id="フィルター種別" onchange="一覧表示()" class="w-full px-4 py-2 border rounded-lg">
+                    <option value="全て">全て</option>
+                    <option value="収入">収入のみ</option>
+                    <option value="支出">支出のみ</option>
+                </select>
+            </div>
+            <div>
+                <label class="block text-sm font-bold mb-2">開始日</label>
+                <input type="date" id="開始日" onchange="一覧表示()" class="w-full px-4 py-2 border rounded-lg">
+            </div>
+            <div>
+                <label class="block text-sm font-bold mb-2">終了日</label>
+                <input type="date" id="終了日" onchange="一覧表示()" class="w-full px-4 py-2 border rounded-lg">
+            </div>
+            <div>
+                <label class="block text-sm font-bold mb-2">検索</label>
+                <input type="text" id="検索" onkeyup="一覧表示()" placeholder="メモで検索" class="w-full px-4 py-2 border rounded-lg">
+            </div>
+        </div>
+    </div>
+
+    <!-- 取引一覧テーブル -->
+    <div class="bg-white rounded-lg shadow-md overflow-hidden">
+        <div class="overflow-x-auto">
+            <table class="w-full">
+                <thead class="bg-gray-100 border-b">
+                    <tr>
+                        <th class="px-6 py-3 text-left text-sm font-bold text-gray-700">日時</th>
+                        <th class="px-6 py-3 text-left text-sm font-bold text-gray-700">種別</th>
+                        <th class="px-6 py-3 text-left text-sm font-bold text-gray-700">種類</th>
+                        <th class="px-6 py-3 text-left text-sm font-bold text-gray-700">金額</th>
+                        <th class="px-6 py-3 text-left text-sm font-bold text-gray-700">メモ</th>
+                        <th class="px-6 py-3 text-left text-sm font-bold text-gray-700">操作</th>
+                    </tr>
+                </thead>
+                <tbody id="取引テーブル">
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+     分析画面
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ -->
+<div id="分析画面" class="hidden">
+    
+    <!-- 期間選択 -->
+    <div class="bg-white p-6 rounded-lg shadow-md mb-6">
+        <h3 class="text-xl font-bold text-gray-800 mb-4">📅 集計期間</h3>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <button onclick="集計('今日')" class="bg-blue-100 hover:bg-blue-200 px-4 py-2 rounded-lg font-bold transition">今日</button>
+            <button onclick="集計('今週')" class="bg-blue-100 hover:bg-blue-200 px-4 py-2 rounded-lg font-bold transition">今週</button>
+            <button onclick="集計('今月')" class="bg-blue-100 hover:bg-blue-200 px-4 py-2 rounded-lg font-bold transition">今月</button>
+            <button onclick="集計('全期間')" class="bg-blue-100 hover:bg-blue-200 px-4 py-2 rounded-lg font-bold transition">全期間</button>
+        </div>
+    </div>
+
+    <!-- 集計結果 -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+        <div class="bg-green-50 p-6 rounded-lg shadow-md border-l-4 border-green-500">
+            <h3 class="text-lg font-bold text-green-700 mb-2">📈 収入合計</h3>
+            <div id="集計収入" class="text-3xl font-bold text-green-600"></div>
+        </div>
+        <div class="bg-red-50 p-6 rounded-lg shadow-md border-l-4 border-red-500">
+            <h3 class="text-lg font-bold text-red-700 mb-2">📉 支出合計</h3>
+            <div id="集計支出" class="text-3xl font-bold text-red-600"></div>
+        </div>
+        <div class="bg-blue-50 p-6 rounded-lg shadow-md border-l-4 border-blue-500">
+            <h3 class="text-lg font-bold text-blue-700 mb-2">💵 収支</h3>
+            <div id="集計収支" class="text-3xl font-bold"></div>
+        </div>
+    </div>
+
+    <!-- カテゴリ別内訳 -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div class="bg-white p-6 rounded-lg shadow-md">
+            <h3 class="text-xl font-bold text-gray-800 mb-4">📊 収入の内訳</h3>
+            <div id="収入内訳" class="space-y-2"></div>
+        </div>
+        <div class="bg-white p-6 rounded-lg shadow-md">
+            <h3 class="text-xl font-bold text-gray-800 mb-4">📊 支出の内訳</h3>
+            <div id="支出内訳" class="space-y-2"></div>
+        </div>
+    </div>
+</div>
+```
+
+</div>
+
+<script>
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// データ管理
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+let 取引履歴 = [];
+let 初期残高 = 8000; // 最初の国庫残高
+
+// ローカルストレージから読み込み
+function データ読み込み() {
+    const 保存済み = localStorage.getItem('取引履歴');
+    if (保存済み) {
+        取引履歴 = JSON.parse(保存済み);
+    }
+    const 残高 = localStorage.getItem('初期残高');
+    if (残高) {
+        初期残高 = parseInt(残高);
+    }
+}
+
+function データ保存() {
+    localStorage.setItem('取引履歴', JSON.stringify(取引履歴));
+}
+
+データ読み込み();
+
+// 現在残高を計算
+function 現在残高計算() {
+    let 残高 = 初期残高;
+    取引履歴.forEach(取引 => {
+        if (取引.種別 === '収入') {
+            残高 += 取引.金額;
+        } else {
+            残高 -= 取引.金額;
+        }
+    });
+    return 残高;
+}
+
+// ヘッダー更新
+function ヘッダー更新() {
+    document.getElementById('現在残高').textContent = 現在残高計算().toLocaleString() + '₭';
+    document.getElementById('総件数').textContent = 取引履歴.length + '件';
+}
+
+ヘッダー更新();
+
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// タブ切り替え
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+function 切り替え(タブ) {
+    ['記録', '一覧', '分析'].forEach(t => {
+        document.getElementById(t + '画面').classList.add('hidden');
+        document.getElementById('tab-' + t).className = 'px-6 py-4 font-bold text-gray-500 hover:text-gray-700';
+    });
+    document.getElementById(タブ + '画面').classList.remove('hidden');
+    document.getElementById('tab-' + タブ).className = 'px-6 py-4 font-bold border-b-2 border-blue-600 text-blue-600';
+    
+    if (タブ === '一覧') 一覧表示();
+    if (タブ === '分析') 集計('全期間');
+}
+
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// 記録画面
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+function 収入を記録() {
+    const 種類 = document.getElementById('収入種類').value;
+    const 金額 = parseInt(document.getElementById('収入金額').value);
+    const メモ = document.getElementById('収入メモ').value;
+    
+    if (!金額 || 金額 <= 0) {
+        alert('⚠️ 金額を入力してください');
+        return;
+    }
+    
+    const 取引 = {
+        id: Date.now(),
+        日時: new Date().toLocaleString('ja-JP'),
+        種別: '収入',
+        種類: 種類,
+        金額: 金額,
+        メモ: メモ
+    };
+    
+    取引履歴.unshift(取引);
+    データ保存();
+    
+    document.getElementById('収入金額').value = '';
+    document.getElementById('収入メモ').value = '';
+    
+    ヘッダー更新();
+    最近の取引表示();
+    alert('✅ 収入を記録しました');
+}
+
+function 支出を記録() {
+    const 種類 = document.getElementById('支出種類').value;
+    const 金額 = parseInt(document.getElementById('支出金額').value);
+    const メモ = document.getElementById('支出メモ').value;
+    
+    if (!金額 || 金額 <= 0) {
+        alert('⚠️ 金額を入力してください');
+        return;
+    }
+    
+    const 取引 = {
+        id: Date.now(),
+        日時: new Date().toLocaleString('ja-JP'),
+        種別: '支出',
+        種類: 種類,
+        金額: 金額,
+        メモ: メモ
+    };
+    
+    取引履歴.unshift(取引);
+    データ保存();
+    
+    document.getElementById('支出金額').value = '';
+    document.getElementById('支出メモ').value = '';
+    
+    ヘッダー更新();
+    最近の取引表示();
+    alert('✅ 支出を記録しました');
+}
+
+function 最近の取引表示() {
+    const html = 取引履歴.slice(0, 10).map(取引 => `
+        <div class="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
+            <div>
+                <div class="font-bold ${取引.種別 === '収入' ? 'text-green-600' : 'text-red-600'}">
+                    ${取引.種別 === '収入' ? '+' : '-'}${取引.金額.toLocaleString()}₭
+                </div>
+                <div class="text-sm text-gray-600">${取引.種類} ${取引.メモ ? '- ' + 取引.メモ : ''}</div>
+            </div>
+            <div class="text-xs text-gray-400">${取引.日時}</div>
+        </div>
+    `).join('');
+    document.getElementById('最近の取引').innerHTML = html || '<p class="text-gray-500">まだ取引がありません</p>';
+}
+
+最近の取引表示();
+
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// 一覧画面
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+function 一覧表示() {
+    const フィルター種別 = document.getElementById('フィルター種別').value;
+    const 開始日 = document.getElementById('開始日').value;
+    const 終了日 = document.getElementById('終了日').value;
+    const 検索 = document.getElementById('検索').value.toLowerCase();
+    
+    let フィルター済み = 取引履歴.filter(取引 => {
+        if (フィルター種別 !== '全て' && 取引.種別 !== フィルター種別) return false;
+        if (検索 && !取引.メモ.toLowerCase().includes(検索) && !取引.種類.toLowerCase().includes(検索)) return false;
+        // 日付フィルター（簡易版）
+        return true;
+    });
+    
+    const html = フィルター済み.map(取引 => `
+        <tr class="border-b hover:bg-gray-50">
+            <td class="px-6 py-4 text-sm">${取引.日時}</td>
+            <td class="px-6 py-4">
+                <span class="px-3 py-1 rounded-full text-sm font-bold ${取引.種別 === '収入' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}">
+                    ${取引.種別}
+                </span>
+            </td>
+            <td class="px-6 py-4 text-sm">${取引.種類}</td>
+            <td class="px-6 py-4 text-sm font-bold ${取引.種別 === '収入' ? 'text-green-600' : 'text-red-600'}">
+                ${取引.種別 === '収入' ? '+' : '-'}${取引.金額.toLocaleString()}₭
+            </td>
+            <td class="px-6 py-4 text-sm">${取引.メモ}</td>
+            <td class="px-6 py-4">
+                <button onclick="削除(${取引.id})" class="text-red-600 hover:text-red-800 text-sm">🗑️ 削除</button>
+            </td>
+        </tr>
+    `).join('');
+    
+    document.getElementById('取引テーブル').innerHTML = html || '<tr><td colspan="6" class="px-6 py-8 text-center text-gray-500">取引がありません</td></tr>';
+}
+
+function 削除(id) {
+    if (confirm('この取引を削除しますか？')) {
+        取引履歴 = 取引履歴.filter(取引 => 取引.id !== id);
+        データ保存();
+        ヘッダー更新();
+        一覧表示();
+        最近の取引表示();
+        alert('✅ 削除しました');
+    }
+}
+
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// 分析画面
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+function 集計(期間) {
+    let 対象取引 = 取引履歴;
+    
+    // 期間フィルター（簡易版）
+    const 今日 = new Date();
+    if (期間 === '今日') {
+        対象取引 = 取引履歴.filter(t => t.日時.startsWith(今日.toLocaleDateString('ja-JP')));
+    }
+    
+    // 収入・支出合計
+    let 収入合計 = 0;
+    let 支出合計 = 0;
+    let 収入別 = {};
+    let 支出別 = {};
+    
+    対象取引.forEach(取引 => {
+        if (取引.種別 === '収入') {
+            収入合計 += 取引.金額;
+            収入別[取引.種類] = (収入別[取引.種類] || 0) + 取引.金額;
+        } else {
+            支出合計 += 取引.金額;
+            支出別[取引.種類] = (支出別[取引.種類] || 0) + 取引.金額;
+        }
+    });
+    
+    const 収支 = 収入合計 - 支出合計;
+    
+    document.getElementById('集計収入').textContent = '+' + 収入合計.toLocaleString() + '₭';
+    document.getElementById('集計支出').textContent = '-' + 支出合計.toLocaleString() + '₭';
+    document.getElementById('集計収支').textContent = (収支 >= 0 ? '+' : '') + 収支.toLocaleString() + '₭';
+    document.getElementById('集計収支').className = `text-3xl font-bold ${収支 >= 0 ? 'text-green-600' : 'text-red-600'}`;
+    
+    // 内訳
+    const 収入html = Object.entries(収入別).map(([種類, 金額]) => `
+        <div class="flex justify-between py-2 border-b">
+            <span>${種類}</span>
+            <span class="font-bold text-green-600">+${金額.toLocaleString()}₭</span>
+        </div>
+    `).join('');
+    
+    const 支出html = Object.entries(支出別).map(([種類, 金額]) => `
+        <div class="flex justify-between py-2 border-b">
+            <span>${種類}</span>
+            <span class="font-bold text-red-600">-${金額.toLocaleString()}₭</span>
+        </div>
+    `).join('');
+    
+    document.getElementById('収入内訳').innerHTML = 収入html || '<p class="text-gray-500">データなし</p>';
+    document.getElementById('支出内訳').innerHTML = 支出html || '<p class="text-gray-500">データなし</p>';
+}
+</script>
+
+</body>
+</html>
